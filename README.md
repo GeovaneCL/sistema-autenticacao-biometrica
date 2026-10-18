@@ -50,6 +50,29 @@ INSERT INTO tb_recurso (id_recurso, descricao, tipo, nivel_sigilo) VALUES
 (102, 'Relatório de Agrotóxicos Banidos e Proibidos', 'AGROTOXICO', 2),
 (103, 'Auditoria Confidencial de Crimes Ambientais', 'PROPRIEDADE_RURAL', 3);
 
+-- adicionando tabela de propriedades Rurais
+USE ministerio_meio_ambiente;
+
+CREATE TABLE tb_propriedade_rural (
+    id_propriedade INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    proprietario VARCHAR(100) NOT NULL,
+    municipio VARCHAR(80) NOT NULL,
+    uf CHAR(2) NOT NULL,
+    area_hectares DECIMAL(10,2) NOT NULL,
+    situacao VARCHAR(40) NOT NULL,
+    nivel_sigilo INT NOT NULL DEFAULT 1
+);
+
+INSERT INTO tb_propriedade_rural
+    (nome, proprietario, municipio, uf, area_hectares, situacao, nivel_sigilo) VALUES
+('Fazenda Boa Esperança', 'João Almeida', 'Rio Verde', 'GO', 1250.50, 'REGULAR', 1),
+('Sítio Três Lagoas', 'Maria Oliveira', 'Unaí', 'MG', 85.00, 'REGULAR', 1),
+('Fazenda Santa Clara', 'Agropecuária Santa Clara Ltda', 'Sorriso', 'MT', 3400.00, 'EM_ANALISE', 2),
+('Fazenda Horizonte', 'Carlos Pereira', 'Luziânia', 'GO', 960.75, 'EM_ANALISE', 2),
+('Fazenda Vale Escuro', 'Grupo Vale Escuro S.A.', 'Lucas do Rio Verde', 'MT', 5200.00, 'IRREGULAR', 3),
+('Estância Rio Turvo', 'Paulo Ferreira', 'Formosa', 'GO', 2100.30, 'IRREGULAR', 3);
+
 Compilação e Execução via Maven:
    ```bash
    mvn clean compile

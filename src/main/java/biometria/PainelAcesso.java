@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JTabbedPane;
 
 public class PainelAcesso extends JFrame {
 
@@ -33,7 +34,10 @@ public class PainelAcesso extends JFrame {
         setContentPane(raiz);
 
         raiz.add(criarCabecalho(), BorderLayout.NORTH);
-        raiz.add(criarTabela(), BorderLayout.CENTER);
+        JTabbedPane abas = new JTabbedPane();
+        abas.addTab("Recursos", criarTabela());
+        abas.addTab("Propriedades Rurais", criarTabelaPropriedades());
+        raiz.add(abas, BorderLayout.CENTER);
         raiz.add(criarRodape(), BorderLayout.SOUTH);
     }
 
@@ -109,6 +113,42 @@ public class PainelAcesso extends JFrame {
         scroll.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
         return scroll;
     }
+    private JScrollPane criarTabelaPropriedades() {
+    String[] colunas = {"ID", "Propriedade", "Proprietário", "Município", "UF",
+                        "Área (ha)", "Situação"};
+
+    DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+        @Override
+        public boolean isCellEditable(int linha, int coluna) {
+            return false;
+        }
+    };
+
+    try {
+        List<PropriedadeRural> propriedades =
+            PropriedadeDAO.listarPorNivel(usuario.getNivelAcesso());
+        for (PropriedadeRural p : propriedades) {
+            modelo.addRow(new Object[] {
+                p.getIdPropriedade(), p.getNome(), p.getProprietario(),
+                p.getMunicipio(), p.getUf(), p.getAreaHectares(), p.getSituacao()
+            });
+        }
+    } catch (BancoDadosException ex) {
+        ex.printStackTrace(); // detalhe técnico fica só no console
+        JOptionPane.showMessageDialog(this,
+            "Não foi possível carregar as propriedades rurais.",
+            "Erro no sistema", JOptionPane.ERROR_MESSAGE);
+    }
+
+    JTable tabela = new JTable(modelo);
+    tabela.setRowHeight(24);
+    tabela.getColumnModel().getColumn(0).setMaxWidth(50);
+    tabela.getColumnModel().getColumn(4).setMaxWidth(45);
+
+    JScrollPane scroll = new JScrollPane(tabela);
+    scroll.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+    return scroll;
+}
 
     private JPanel criarRodape() {
         JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
