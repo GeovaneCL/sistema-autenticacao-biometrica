@@ -5,3 +5,7 @@ lib/
 .classpath
 .project
 .settings/
+faces/
+haarcascade_frontalface_default.xml
+foto.jpg
+biometria_processada.jpg
