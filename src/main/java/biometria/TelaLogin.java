@@ -59,7 +59,13 @@ public class TelaLogin extends JFrame {
         String vetor = campoVetor.getText().trim();
 
         try {
+            ControleTentativas.verificarBloqueio();
+
             UsuarioSistema usuario = SistemaAutenticacao.autenticarUsuario(vetor);
+
+            ControleTentativas.registrarSucesso();
+            LogAcessoDAO.registrar(usuario.getIdUsuario(), "ACESSO_CONCEDIDO",
+                    "Login realizado com sucesso");
 
             lblStatus.setForeground(new Color(0, 128, 0));
             lblStatus.setText("Autenticado: " + usuario.getNome());
@@ -67,11 +73,29 @@ public class TelaLogin extends JFrame {
             new PainelAcesso(usuario).setVisible(true);
             dispose(); // fecha a tela de login
 
+        } catch (TentativaInvasaoException ex) {
+            mostrarErro("Acesso bloqueado", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+
         } catch (LeituraBiometricaException ex) {
+            LogAcessoDAO.registrar(null, "LEITURA_INVALIDA", ex.getMessage());
             mostrarErro("Leitura inválida", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
 
         } catch (BiometriaNaoReconhecidaException ex) {
-            mostrarErro("Acesso negado", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            LogAcessoDAO.registrar(null, "BIOMETRIA_NEGADA", ex.getMessage());
+
+            if (ControleTentativas.registrarFalha()) {
+                LogAcessoDAO.registrar(null, "BLOQUEIO",
+                        "Bloqueio após " + ControleTentativas.MAX_TENTATIVAS + " falhas seguidas");
+                mostrarErro("Acesso bloqueado",
+                        "Muitas tentativas inválidas. Acesso bloqueado por "
+                                + (ControleTentativas.BLOQUEIO_MS / 1000) + " segundos.",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                mostrarErro("Acesso negado",
+                        ex.getMessage() + "\nTentativas restantes: "
+                                + ControleTentativas.tentativasRestantes(),
+                        JOptionPane.ERROR_MESSAGE);
+            }
 
         } catch (BancoDadosException ex) {
             ex.printStackTrace(); // detalhe técnico fica só no console

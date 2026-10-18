@@ -73,6 +73,17 @@ INSERT INTO tb_propriedade_rural
 ('Fazenda Vale Escuro', 'Grupo Vale Escuro S.A.', 'Lucas do Rio Verde', 'MT', 5200.00, 'IRREGULAR', 3),
 ('Estância Rio Turvo', 'Paulo Ferreira', 'Formosa', 'GO', 2100.30, 'IRREGULAR', 3);
 
+--tabela de log
+USE ministerio_meio_ambiente;
+
+CREATE TABLE tb_log_acesso (
+    id_log INT PRIMARY KEY AUTO_INCREMENT,
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_usuario INT NULL,
+    resultado VARCHAR(30) NOT NULL,
+    detalhe VARCHAR(255)
+);
+
 Compilação e Execução via Maven:
    ```bash
    mvn clean compile
