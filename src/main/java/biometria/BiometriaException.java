@@ -4,11 +4,12 @@ public class BiometriaException extends Exception {
 
     // Tipos de erro tratados pelo sistema
     public enum Tipo {
-        LEITURA_INVALIDA,   // vetor vazio ou ilegível
+        LEITURA_INVALIDA,   // vetor vazio, ilegível ou nenhum rosto detectado
         NAO_RECONHECIDA,    // nenhum usuário corresponde à biometria
         ACESSO_NEGADO,      // nível de acesso insuficiente
         BANCO_DADOS,        // falha de conexão ou consulta
-        BLOQUEIO            // login bloqueado por excesso de tentativas
+        BLOQUEIO,             // login bloqueado por excesso de tentativas
+        FACIAL_INDISPONIVEL   // sem câmera, sem detector facial ou sem rostos cadastrados
     }
 
     private final Tipo tipo;

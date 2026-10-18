@@ -1,3 +1,6 @@
+/GEO/
+Gente, além da diminuição das classes eu adicionei novas tabelas que é possível ver de acordo com o nível de acesso após login.Para o login via biometrica facial é necessario rodar a classe `PreProcessamentoBiometrico.java` Durante a execução vai pedir primeiro o dado de acordo que está na tabela (SELECT id_usuario, nome FROM tb_usuario;), faça o uso desse comando para saber qual caractére usar da coluda `id_usuario`, após a validação o programa vai tirar 10 fotos do rosto de vocês em preto e branco e vai adicionar na pasta `faces`(eu fiz um comando no gitbash para que commits futuros não envie fotos do nosso rosto para o github).
+
 /DUDA/
 Gente, eu só mudei as pastas do jeito que o maven pede, desse jeito aí fica mais fácil do maven achar o pom, o pom e a foto tem que ficar na pasta principal (SistemaBiometrico), e fiz apenas um pre processamento ele só fala se o caminho é certo ou errado, é apenas para testar se o maven funciona.
 
@@ -51,7 +54,6 @@ INSERT INTO tb_recurso (id_recurso, descricao, tipo, nivel_sigilo) VALUES
 (103, 'Auditoria Confidencial de Crimes Ambientais', 'PROPRIEDADE_RURAL', 3);
 
 -- adicionando tabela de propriedades Rurais
-USE ministerio_meio_ambiente;
 
 CREATE TABLE tb_propriedade_rural (
     id_propriedade INT PRIMARY KEY AUTO_INCREMENT,
@@ -74,7 +76,7 @@ INSERT INTO tb_propriedade_rural
 ('Estância Rio Turvo', 'Paulo Ferreira', 'Formosa', 'GO', 2100.30, 'IRREGULAR', 3);
 
 --tabela de log
-USE ministerio_meio_ambiente;
+
 
 CREATE TABLE tb_log_acesso (
     id_log INT PRIMARY KEY AUTO_INCREMENT,
