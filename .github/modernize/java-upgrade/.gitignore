@@ -1,0 +1,12 @@
+# Compilação e binários
+target/
+bin/
+
+# Configurações de IDE e sistema
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Ficheiro de conexão com credenciais locais
+src/main/java/biometria/Conexao.java

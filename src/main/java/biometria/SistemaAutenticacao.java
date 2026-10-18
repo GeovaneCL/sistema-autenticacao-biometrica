@@ -12,48 +12,55 @@ public class SistemaAutenticacao {
     }
 
     //autenticar o usuario no bd Mysql
-    public static UsuarioSistema autenticarUsuario(String vetorBiometricoEntrada){
+    public static UsuarioSistema autenticarUsuario(String vetorBiometricoEntrada)
+            throws BiometriaException {
+
+        if (vetorBiometricoEntrada == null || vetorBiometricoEntrada.isBlank()) {
+            throw new LeituraBiometricaException("Leitura biométrica vazia ou inválida.");
+        }
+
         String sql = "SELECT id_usuario, nome, cargo, nivel_acesso, vetor_biometrico FROM tb_usuario";
 
         try(Connection conn = Conexao.conectar();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+                
 
+            while (rs.next()) {
+                String vetorBD = rs.getString("vetor_biometrico");
 
-                while (rs.next()) {
-                    String vetorBD = rs.getString("vetor_biometrico");
-
-                    if (compararBiometria(vetorBiometricoEntrada, vetorBD)){
-                        return new UsuarioSistema(
-                            rs.getInt("id_usuario"),
-                            rs.getString("nome"),
-                            rs.getString("cargo"),
-                            rs.getInt("nivel_acesso"),
-                            vetorBD
-                        );
-                    }
+                if (compararBiometria(vetorBiometricoEntrada, vetorBD)){
+                    return new UsuarioSistema(
+                        rs.getInt("id_usuario"),
+                        rs.getString("nome"),
+                        rs.getString("cargo"),
+                        rs.getInt("nivel_acesso"),
+                        vetorBD
+                    );
                 }
-            } catch (SQLException e) {
-            System.err.println("Erro ao conectar no banco MySQL: " + e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new BancoDadosException("Falha ao acessar o banco de dados.", e);
         }
 
-        return null; // Usuário não encontrado ou biometria incorreta
+        throw new BiometriaNaoReconhecidaException();
     }
 
-    // Regra de negócio e acesso 
+    // Regra de negócio e acesso
     public static void solicitarAcessoAoRecurso(String vetorBiometricoEntrada, int idRecursoSolicitado) {
         System.out.println("--- INICIANDO AUTENTICAÇÃO E CONTROLE DE ACESSO ---");
 
         // Autenticar pela biometria usando UsuarioSistema
-        UsuarioSistema usuario = autenticarUsuario(vetorBiometricoEntrada);
-
-        if (usuario == null) {
-            System.out.println("[ACESSO NEGADO] Biometria não encontrada no sistema.");
+        UsuarioSistema usuario;
+        try {
+            usuario = autenticarUsuario(vetorBiometricoEntrada);
+        } catch (BiometriaException e) {
+            System.out.println("[ACESSO NEGADO] " + e.getMessage());
             return;
         }
 
-        System.out.println("[AUTENTICADO] Usuário: " + usuario.getNome() + 
-                           " | Cargo: " + usuario.getCargo() + 
+        System.out.println("[AUTENTICADO] Usuário: " + usuario.getNome() +
+                           " | Cargo: " + usuario.getCargo() +
                            " | Nível: " + usuario.getNivelAcesso());
 
         // Buscar o recurso solicitado no banco
@@ -77,7 +84,7 @@ public class SistemaAutenticacao {
                 if (usuario.getNivelAcesso() >= recurso.getNivelSigilo()) {
                     System.out.println("[ACESSO CONCEDIDO] Exibindo recurso: " + recurso.getDescricao());
                 } else {
-                    System.out.println("[ACESSO BLOQUEADO] Nível " + usuario.getNivelAcesso() + 
+                    System.out.println("[ACESSO BLOQUEADO] Nível " + usuario.getNivelAcesso() +
                                        " não tem acesso ao recurso de Nível " + recurso.getNivelSigilo());
                 }
             } else {
