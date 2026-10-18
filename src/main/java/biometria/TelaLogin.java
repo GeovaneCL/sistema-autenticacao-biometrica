@@ -64,14 +64,8 @@ public class TelaLogin extends JFrame {
             lblStatus.setForeground(new Color(0, 128, 0));
             lblStatus.setText("Autenticado: " + usuario.getNome());
 
-            // Vamos abrir o painel do nível de acesso.
-            // Por enquanto, só mostramos os dados do usuário.
-            JOptionPane.showMessageDialog(this,
-                    "Bem-vindo(a), " + usuario.getNome()
-                            + "\nCargo: " + usuario.getCargo()
-                            + "\nNível de acesso: " + usuario.getNivelAcesso(),
-                    "Acesso liberado", JOptionPane.INFORMATION_MESSAGE);
-            repaint();
+            new PainelAcesso(usuario).setVisible(true);
+            dispose(); // fecha a tela de login
 
         } catch (LeituraBiometricaException ex) {
             mostrarErro("Leitura inválida", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
