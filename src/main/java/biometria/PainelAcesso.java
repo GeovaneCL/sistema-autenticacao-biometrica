@@ -37,6 +37,9 @@ public class PainelAcesso extends JFrame {
         JTabbedPane abas = new JTabbedPane();
         abas.addTab("Recursos", criarTabela());
         abas.addTab("Propriedades Rurais", criarTabelaPropriedades());
+        if (usuario.getNivelAcesso() >= 2) {
+            abas.addTab("Relatórios", new PainelRelatorios(usuario));
+        }
         raiz.add(abas, BorderLayout.CENTER);
         raiz.add(criarRodape(), BorderLayout.SOUTH);
     }
