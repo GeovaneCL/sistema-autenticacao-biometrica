@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import biometria.BiometriaException.Tipo;
+
 //logica de comparação
 public class SistemaAutenticacao {
     public static boolean compararBiometria(String vetorEntrada, String vetorBD) {
@@ -16,7 +18,8 @@ public class SistemaAutenticacao {
             throws BiometriaException {
 
         if (vetorBiometricoEntrada == null || vetorBiometricoEntrada.isBlank()) {
-            throw new LeituraBiometricaException("Leitura biométrica vazia ou inválida.");
+            throw new BiometriaException(Tipo.LEITURA_INVALIDA,
+                    "Leitura biométrica vazia ou inválida.");
         }
 
         String sql = "SELECT id_usuario, nome, cargo, nivel_acesso, vetor_biometrico FROM tb_usuario";
@@ -24,7 +27,7 @@ public class SistemaAutenticacao {
         try(Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-                
+
 
             while (rs.next()) {
                 String vetorBD = rs.getString("vetor_biometrico");
@@ -40,10 +43,12 @@ public class SistemaAutenticacao {
                 }
             }
         } catch (SQLException e) {
-            throw new BancoDadosException("Falha ao acessar o banco de dados.", e);
+            throw new BiometriaException(Tipo.BANCO_DADOS,
+                    "Falha ao acessar o banco de dados.", e);
         }
 
-        throw new BiometriaNaoReconhecidaException();
+        throw new BiometriaException(Tipo.NAO_RECONHECIDA,
+                "Biometria não reconhecida no sistema.");
     }
 
     // Regra de negócio e acesso
@@ -80,7 +85,7 @@ public class SistemaAutenticacao {
                     rs.getInt("nivel_sigilo")
                 );
 
-                // Validar a permissão (Nível do Usuário >= Nível de Sigilo)
+                 // Validar a permissão (Nível do Usuário >= Nível de Sigilo)
                 if (usuario.getNivelAcesso() >= recurso.getNivelSigilo()) {
                     System.out.println("[ACESSO CONCEDIDO] Exibindo recurso: " + recurso.getDescricao());
                 } else {
